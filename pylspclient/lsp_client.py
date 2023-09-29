@@ -88,7 +88,6 @@ class LspClient(object):
 
         return self.lsp_endpoint.send_notification("textDocument/didOpen", textDocument=textDocument)
 
-
     def didChange(self, textDocument, contentChanges):
         """
         The document change notification is sent from the client to the server to signal changes to a text document.
@@ -102,7 +101,6 @@ class LspClient(object):
 
         return self.lsp_endpoint.send_notification("textDocument/didChange", textDocument=textDocument, contentChanges=contentChanges)
 
-
     def documentSymbol(self, textDocument):
         """
         The document symbol request is sent from the client to the server to
@@ -112,7 +110,9 @@ class LspClient(object):
 
         :param TextDocumentItem textDocument: The text document.
         """
-        result_dict =  self.lsp_endpoint.call_method("textDocument/documentSymbol", textDocument=textDocument)
+        result_dict = self.lsp_endpoint.call_method(
+            "textDocument/documentSymbol", textDocument=textDocument)
+
         return [lsp_structs.SymbolInformation(**sym) for sym in result_dict]
 
     def declaration(self, textDocument, position):
@@ -129,7 +129,10 @@ class LspClient(object):
         :param Position position: The position inside the text document.
         """
 
-        result_dict = self.lsp_endpoint.call_method("textDocument/declaration", textDocument=textDocument, position=position)
+        result_dict = self.lsp_endpoint.call_method("textDocument/declaration",
+                                                    textDocument=textDocument,
+                                                    position=position)
+
         if "uri" in result_dict:
             return lsp_structs.Location(**result_dict)
 
@@ -148,6 +151,7 @@ class LspClient(object):
         result_dict = self.lsp_endpoint.call_method("textDocument/definition",
                                                     textDocument=textDocument,
                                                     position=position)
+
         return [lsp_structs.Location(**loc) for loc in result_dict]
 
     def typeDefinition(self, textDocument, position):
@@ -163,6 +167,7 @@ class LspClient(object):
         result_dict = self.lsp_endpoint.call_method("textDocument/definition",
                                                     textDocument=textDocument,
                                                     position=position)
+
         return [lsp_structs.Location(**loc) for loc in result_dict]
 
     def signatureHelp(self, textDocument, position):
@@ -174,20 +179,28 @@ class LspClient(object):
         :param Position position: The position inside the text document.
         """
 
-        result_dict = self.lsp_endpoint.call_method("textDocument/signatureHelp", textDocument=textDocument, position=position)
+        result_dict = self.lsp_endpoint.call_method(
+            "textDocument/signatureHelp", textDocument=textDocument,
+            position=position)
+
         return lsp_structs.SignatureHelp(**result_dict)
 
     def completion(self, textDocument, position, context):
         """
-        The signature help request is sent from the client to the server to request signature information at a given cursor position.
+        The signature help request is sent from the client to the server to
+        request signature information at a given cursor position.
 
         :param TextDocumentItem textDocument: The text document.
         :param Position position: The position inside the text document.
-        :param CompletionContext context: The completion context. This is only available if the client specifies
-                                            to send this using `ClientCapabilities.textDocument.completion.contextSupport === true`
+        :param CompletionContext context: The completion context. This is only
+                                          available if the client specifies
+                                          to send this using `ClientCapabilities.textDocument.completion.contextSupport === true`
         """
 
-        result_dict = self.lsp_endpoint.call_method("textDocument/completion", textDocument=textDocument, position=position, context=context)
+        result_dict = self.lsp_endpoint.call_method("textDocument/completion",
+                                                    textDocument=textDocument,
+                                                    position=position,
+                                                    context=context)
         if "isIncomplete" in result_dict:
             return lsp_structs.CompletionList(**result_dict)
 
@@ -195,18 +208,40 @@ class LspClient(object):
 
     def definition(self, textDocument, position):
         """
-        The go to definition request is sent from the client to the server to resolve the declaration location of a
-        symbol at a given text document position.
+        The go to definition request is sent from the client to the server to
+        resolve the declaration location of a symbol at a given text document
+        position.
 
-        The result type LocationLink[] got introduce with version 3.14.0 and depends in the corresponding client
-        capability `clientCapabilities.textDocument.declaration.linkSupport`.
+        The result type LocationLink[] got introduce with version 3.14.0 and
+        depends in the corresponding client capability
+        `clientCapabilities.textDocument.declaration.linkSupport`.
 
         :param TextDocumentItem textDocument: The text document.
         :param Position position: The position inside the text document.
         """
 
-        result_dict = self.lsp_endpoint.call_method("textDocument/definition", textDocument=textDocument, position=position)
+        result_dict = self.lsp_endpoint.call_method("textDocument/definition",
+                                                    textDocument=textDocument,
+                                                    position=position)
+
         if "uri" in result_dict:
             return lsp_structs.Location(**result_dict)
 
-        return [lsp_structs.Location(**l) if "uri" in l else lsp_structs.LinkLocation(**l) for l in result_dict]
+        return [lsp_structs.Location(**l)
+                if "uri" in l else lsp_structs.LinkLocation(**l) for l in result_dict]
+
+    def references(self, textDocument, position):
+        """
+        The references request is sent from the client to the server to resolve
+        project-wide references for the symbol denoted by the given text
+        document position.
+
+        :param TextDocumentItem textDocument: The text document.
+        :param Position position: The position inside the text document.
+        """
+
+        result_dict = self.lsp_endpoint.call_method("textDocument/references",
+                                                    textDocument=textDocument,
+                                                    position=position)
+
+        return [lsp_structs.Location(**loc) for loc in result_dict]
