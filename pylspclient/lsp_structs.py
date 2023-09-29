@@ -3,11 +3,13 @@ import enum
 
 def to_type(o, new_type):
     '''
-    Helper funciton that receives an object or a dict and convert it to a new given type.
+    Helper funciton that receives an object or a dict and convert it to a new
+    given type.
 
     :param object|dict o: The object to convert
     :param Type new_type: The type to convert to.
     '''
+
     if new_type == type(o):
         return o
     else:
@@ -20,7 +22,8 @@ class Position(object):
         Constructs a new Position instance.
 
         :param int line: Line position in a document (zero-based).
-        :param int character: Character offset on a line in a document (zero-based).
+        :param int character: Character offset on a line in a document
+                              (zero-based).
         """
         self.line = line
         self.character = character
@@ -42,6 +45,7 @@ class Location(object):
     """
     Represents a location inside a resource, such as a line inside a text file.
     """
+
     def __init__(self, uri, range):
         """
         Constructs a new Location instance.
@@ -57,17 +61,19 @@ class LocationLink(object):
     """
     Represents a link between a source and a target location.
     """
-    def __init__(self, originSelectionRange, targetUri, targetRange, targetSelectionRange):
+
+    def __init__(self, originSelectionRange, targetUri, targetRange,
+                 targetSelectionRange):
         """
         Constructs a new LocationLink instance.
 
         :param Range originSelectionRange: Span of the origin of this link.
             Used as the underlined span for mouse interaction. Defaults to the word range at the mouse position.
         :param str targetUri: The target resource identifier of this link.
-        :param Range targetRange: The full target range of this link. If the target for example is a symbol then target 
+        :param Range targetRange: The full target range of this link. If the target for example is a symbol then target
             range is the range enclosing this symbol not including leading/trailing whitespace but everything else
             like comments. This information is typically used to highlight the range in the editor.
-        :param Range targetSelectionRange: The range that should be selected and revealed when this link is being followed, 
+        :param Range targetSelectionRange: The range that should be selected and revealed when this link is being followed,
             e.g the name of a function. Must be contained by the the `targetRange`. See also `DocumentSymbol#range`
         """
         self.originSelectionRange = to_type(originSelectionRange, Range)
@@ -75,7 +81,7 @@ class LocationLink(object):
         self.targetRange = to_type(targetRange, Range)
         self.targetSelectionRange = to_type(targetSelectionRange, Range)
 
- 
+
 class Diagnostic(object):
      def __init__(self, range, severity, code, source, message, relatedInformation):
         """
@@ -87,7 +93,7 @@ class Diagnostic(object):
         :param str source: A human-readable string describing the source of this
                             diagnostic, e.g. 'typescript' or 'super lint'.
         :param str message: The diagnostic's message.
-        :param list relatedInformation: An array of related diagnostic information, e.g. when symbol-names within   
+        :param list relatedInformation: An array of related diagnostic information, e.g. when symbol-names within
                                         a scope collide all definitions can be marked via this property.
         """
         self.range = range
@@ -115,7 +121,7 @@ class DiagnosticRelatedInformation(object):
         self.location = location
         self.message = message
 
- 
+
 class Command(object):
      def __init__(self, title, command, arguments):
         """
@@ -136,7 +142,7 @@ class TextDocumentItem(object):
     def __init__(self, uri, languageId, version, text):
         """
         Constructs a new Diagnostic instance.
-        
+
         :param DocumentUri uri: Title of the command, like `save`.
         :param str languageId: The identifier of the actual command handler.
         :param int version: Arguments that the command handler should be invoked with.
@@ -150,13 +156,13 @@ class TextDocumentItem(object):
 
 class TextDocumentIdentifier(object):
     """
-    Text documents are identified using a URI. On the protocol level, URIs are passed as strings. 
+    Text documents are identified using a URI. On the protocol level, URIs are passed as strings.
     """
     def __init__(self, uri):
         """
         Constructs a new TextDocumentIdentifier instance.
 
-        :param DocumentUri uri: The text document's URI.       
+        :param DocumentUri uri: The text document's URI.
         """
         self.uri = uri
 
@@ -168,13 +174,13 @@ class VersionedTextDocumentIdentifier(TextDocumentIdentifier):
     def __init__(self, uri, version):
         """
         Constructs a new TextDocumentIdentifier instance.
-        
+
         :param DocumentUri uri: The text document's URI.
-        :param int version: The version number of this document. If a versioned 
-            text document identifier is sent from the server to the client and 
-            the file is not open in the editor (the server has not received an 
-            open notification before) the server can send `null` to indicate 
-            that the version is known and the content on disk is the truth (as 
+        :param int version: The version number of this document. If a versioned
+            text document identifier is sent from the server to the client and
+            the file is not open in the editor (the server has not received an
+            open notification before) the server can send `null` to indicate
+            that the version is known and the content on disk is the truth (as
             speced with document content ownership).
         The version number of a document will increase after each change, including
         undo/redo. The number doesn't need to be consecutive.
@@ -208,7 +214,7 @@ class TextDocumentPositionParams(object):
     def __init__(self, textDocument, position):
         """
         Constructs a new TextDocumentPositionParams instance.
-        
+
         :param TextDocumentIdentifier textDocument: The text document.
         :param Position position: The position inside the text document.
         """
@@ -412,7 +418,7 @@ class TextEdit(object):
     """
     def __init__(self, range, newText):
         """
-        :param Range range: The range of the text document to be manipulated. To insert 
+        :param Range range: The range of the text document to be manipulated. To insert
                             text into a document create a range where start === end.
         :param str newText: The string to be inserted. For delete operations use an empty string.
         """
@@ -428,8 +434,8 @@ class InsertTextFormat(object):
 class CompletionItem(object):
     """
     """
-    def __init__(self, label, kind=None, detail=None, documentation=None, deprecated=None, presented=None, sortText=None, filterText=None, insertText=None, insertTextFormat=None, textEdit=None, additionalTextEdits=None, commitCharacters=None, command=None, data=None, score=0.0): 
-        """  
+    def __init__(self, label, kind=None, detail=None, documentation=None, deprecated=None, presented=None, sortText=None, filterText=None, insertText=None, insertTextFormat=None, textEdit=None, additionalTextEdits=None, commitCharacters=None, command=None, data=None, score=0.0):
+        """
         :param str label: The label of this completion item. By default also the text that is inserted when selecting
                         this completion.
         :param int kind: The kind of this completion item. Based of the kind an icon is chosen by the editor.
@@ -450,7 +456,7 @@ class CompletionItem(object):
         :param TextEdit textEdit: An edit which is applied to a document when selecting this completion. When an edit is provided the value of `insertText` is ignored.
                                     Note:* The range of the edit must be a single line range and it must contain the position at which completion
                                     has been requested.
-        :param TextEdit additionalTextEdits: An optional array of additional text edits that are applied when selecting this completion. 
+        :param TextEdit additionalTextEdits: An optional array of additional text edits that are applied when selecting this completion.
                                                 Edits must not overlap (including the same insert position) with the main edit nor with themselves.
                                                 Additional text edits should be used to change text unrelated to the current cursor position
                                                 (for example adding an import statement at the top of the file if the completion item will
@@ -516,7 +522,7 @@ class CompletionList(object):
     def __init__(self, isIncomplete, items):
         """
         Constructs a new CompletionContext instance.
-        
+
         :param bool isIncomplete: This list it not complete. Further typing should result in recomputing this list.
         :param CompletionItem items: The completion items.
         """

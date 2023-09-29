@@ -145,7 +145,9 @@ class LspClient(object):
         :param Position position: The position inside the text document.
         """
 
-        result_dict = self.lsp_endpoint.call_method("textDocument/definition", textDocument=textDocument, position=position)
+        result_dict = self.lsp_endpoint.call_method("textDocument/definition",
+                                                    textDocument=textDocument,
+                                                    position=position)
         return [lsp_structs.Location(**loc) for loc in result_dict]
 
     def typeDefinition(self, textDocument, position):
@@ -158,7 +160,9 @@ class LspClient(object):
         :param Position position: The position inside the text document.
         """
 
-        result_dict = self.lsp_endpoint.call_method("textDocument/definition", textDocument=textDocument, position=position)
+        result_dict = self.lsp_endpoint.call_method("textDocument/definition",
+                                                    textDocument=textDocument,
+                                                    position=position)
         return [lsp_structs.Location(**loc) for loc in result_dict]
 
     def signatureHelp(self, textDocument, position):
