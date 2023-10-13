@@ -2,6 +2,47 @@ import pylspclient
 import subprocess
 import threading
 import argparse
+import linecache
+import urllib.parse
+
+
+def extractFilePath(uri):
+    file_path = urllib.parse.unquote(uri)
+
+    idx = uri.find("file://")
+    if idx > -1:
+        file_path = file_path[idx+7:]
+
+    return file_path
+
+
+def showInterpretation(loc):
+    file_path = extractFilePath(loc.uri)
+    code_line = loc.range.start.line+1
+    linestr = linecache.getline(file_path, code_line)
+
+    idx_start = loc.range.start.character
+    idx_end = loc.range.end.character
+
+    print("INTERP:")
+    print("  File: " + file_path)
+    print("  Loc:  " + str(code_line) + ":" +
+          str(idx_start+1) + ":" + str(idx_end))
+    print("  Data: |" + linestr[idx_start:idx_end] + "|")
+
+
+def showInterpretations(locations):
+    for loc in locations:
+        showInterpretation(loc)
+
+
+def interpTextDocumentDefinition(locations):
+    showInterpretations(locations)
+
+
+def interpTextDocumentTypeReferences(references):
+    showInterpretations(references)
+
 
 class ReadPipe(threading.Thread):
     def __init__(self, pipe):
@@ -196,23 +237,90 @@ if __name__ == "__main__":
     )
     print(lsp_client.initialized())
 
-    file_path = "/home/osboxes/projects/ctest/test.c"
+    # file_path = "/home/vistdn/Misc/Tests/05_python/000_libclang_cindex/example/my_app/src/main.cpp"
+    file_path = "/home/vistdn/Workspace/Repos/microsar-adaptive-worktrees/r7-UMAMI-1/BSW/amsr-vector-fs-per-libpersistency/lib/persistency-key-value-storage/include/ara/per/key_value_storage.h"
     uri = "file://" + file_path
     text = open(file_path, "r").read()
     languageId = pylspclient.lsp_structs.LANGUAGE_IDENTIFIER.C
     version = 1
-    lsp_client.didOpen(pylspclient.lsp_structs.TextDocumentItem(uri, languageId, version, text))
-    try:
-        symbols = lsp_client.documentSymbol(pylspclient.lsp_structs.TextDocumentIdentifier(uri))
-        for symbol in symbols:
-            print(symbol.name)
-    except pylspclient.lsp_structs.ResponseError:
-        # documentSymbol is supported from version 8.
-        print("Failed to document symbols")
+    lsp_client.didOpen(
+        pylspclient.lsp_structs.TextDocumentItem(
+            uri, languageId, version, text))
 
-    lsp_client.definition(pylspclient.lsp_structs.TextDocumentIdentifier(uri), pylspclient.lsp_structs.Position(14, 4))
-    lsp_client.signatureHelp(pylspclient.lsp_structs.TextDocumentIdentifier(uri), pylspclient.lsp_structs.Position(14, 4))
-    lsp_client.definition(pylspclient.lsp_structs.TextDocumentIdentifier(uri), pylspclient.lsp_structs.Position(14, 4))
-    lsp_client.completion(pylspclient.lsp_structs.TextDocumentIdentifier(uri), pylspclient.lsp_structs.Position(14, 4), pylspclient.lsp_structs.CompletionContext(pylspclient.lsp_structs.CompletionTriggerKind.Invoked))
+    print("\n====== Tests ==================================")
+
+    # try:
+    #     symbols = lsp_client.documentSymbol(
+    #         pylspclient.lsp_structs.TextDocumentIdentifier(uri)
+    #     )
+    #     for symbol in symbols:
+    #         print(symbol.name)
+    # except pylspclient.lsp_structs.ResponseError:
+    #     # documentSymbol is supported from version 8.
+    #     print("Failed to document symbols")
+
+    # print("\n\n  --- textDocument/documentSymbol ---\n")
+    # response = lsp_client.documentSymbol(
+    #     pylspclient.lsp_structs.TextDocumentIdentifier(uri))
+    # interpTextDocumentDocumentSymbol(response)
+    #
+    # print("\n\n  --- textDocument/declaration ---\n")
+    # response = lsp_client.declaration(
+    #     pylspclient.lsp_structs.TextDocumentIdentifier(uri),
+    #     pylspclient.lsp_structs.Position(161, 16))
+    # interpTextDocumentDeclaration(response)
+    #
+    # print("\n  --- textDocument/definition ---\n")
+    # response = lsp_client.definition(
+    #     pylspclient.lsp_structs.TextDocumentIdentifier(uri),
+    #     pylspclient.lsp_structs.Position(161, 16))
+    # interpTextDocumentDefinition(response)
+    #
+    # print("\n  --- textDocument/typeDefinition ---\n")
+    # response = lsp_client.typeDefinition(
+    #     pylspclient.lsp_structs.TextDocumentIdentifier(uri),
+    #     pylspclient.lsp_structs.Position(161, 16))
+    # interpTextDocumentTypeDefinition(response)
+    #
+    # print("\n\n  --- textDocument/signatureHelp ---\n")
+    # response = lsp_client.signatureHelp(
+    #     pylspclient.lsp_structs.TextDocumentIdentifier(uri),
+    #     pylspclient.lsp_structs.Position(129, 25))
+    # interpTextDocumentTypeSignatureHelp(response)
+    #
+    # print("\n\n  --- textDocument/references ---\n")
+    # response = lsp_client.definition(
+    #     pylspclient.lsp_structs.TextDocumentIdentifier(uri),
+    #     pylspclient.lsp_structs.Position(129, 25))
+    # interpTextDocumentTypeDefinition(response)
+    # response = lsp_client.references(
+    #     pylspclient.lsp_structs.TextDocumentIdentifier(uri),
+    #     pylspclient.lsp_structs.Position(129, 25))
+    # interpTextDocumentTypeReferences(response)
+
+    # lsp_client.completion(
+    #     pylspclient.lsp_structs.TextDocumentIdentifier(uri),
+    #     pylspclient.lsp_structs.Position(14, 4),
+    #     pylspclient.lsp_structs.CompletionContext(
+    #         pylspclient.lsp_structs.CompletionTriggerKind.Invoked
+    #     ),
+    # )
+
+    # print("\n  --- textDocument/definition ---\n")
+    # response = lsp_client.definition(
+    #     pylspclient.lsp_structs.TextDocumentIdentifier(uri),
+    #     pylspclient.lsp_structs.Position(358, 21))
+    # # pylspclient.lsp_structs.Position(354, 11))
+    # # pylspclient.lsp_structs.Position(356, 10))
+    # interpTextDocumentDefinition(response)
+
+    # TODO: Implement Hover
+    # print("\n  --- textDocument/hover ---\n")
+
+    # TODO: Implement FoldingRange
+    # print("\n  --- textDocument/foldingRange ---\n")
+
+    print("\n===============================================\n")
+
     lsp_client.shutdown()
     lsp_client.exit()
